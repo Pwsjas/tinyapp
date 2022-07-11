@@ -20,7 +20,7 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//new
+
 //View All tinyURLs
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
@@ -41,15 +41,24 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-
+//////////////////////////////////////////////////////////////////////
+//POST//
+//////////////////////////////////////////////////////////////////////
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const shortUrl = generateRandomString(req.body.longURL);
   urlDatabase[shortUrl] = req.body.longURL;
-  res.redirect(`urls/:${shortUrl}`);
+  res.redirect(`/urls/:${shortUrl}`);
 });
-//new
+
+app.post("/urls/:id/delete", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  const deleteURL = req.body.id;
+  delete urlDatabase[deleteURL];
+  res.redirect('/urls')
+});
+
 
 
 app.listen(PORT, () => {
