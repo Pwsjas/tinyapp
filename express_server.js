@@ -40,7 +40,9 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const shortUrl = generateRandomString(req.body.longURL);
+  urlDatabase[shortUrl] = req.body.longURL;
+  res.send(urlDatabase); // Respond with 'Ok' (we will replace this)
 });
 //new
 
@@ -59,7 +61,7 @@ function generateRandomString() {
     if (random <= 10) {
       generatedString += random;
     } else {
-      generatedString += String.fromCharCode(random + 76);
+      generatedString += String.fromCharCode(random + 86);
     }
   }
   return generatedString;
