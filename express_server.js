@@ -23,6 +23,10 @@ app.get("/urls.json", (req, res) => {
 });
 
 
+//////////////////////////////////////////////////////////////////////
+//GET//
+//////////////////////////////////////////////////////////////////////
+
 //View All tinyURLs
 app.get("/urls", (req, res) => {
   const templateVars = { 
@@ -40,13 +44,13 @@ app.get("/urls/new", (req, res) => {
 });
 //View Specific tinyURL
 app.get("/urls/:id", (req, res) => {
-  let templateVars = '';
+  let templateVars = {};
   if (req.params.id[0] === ':') {
     templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id.slice(1)] };
   } else {  
     templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   }
-  templateVars[username] = req.cookies['username'];
+  templateVars['username'] = req.cookies['username'];
   res.render("urls_show", templateVars);
 });
 //Go to specified tinyURL
