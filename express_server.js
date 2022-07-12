@@ -32,7 +32,12 @@ app.get("/urls/new", (req, res) => {
 });
 //View Specific tinyURL
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id.slice(1)] };
+  let templateVars = '';
+  if (req.params.id[0] === ':') {
+    templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id.slice(1)] };
+  } else {  
+    templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  }
   res.render("urls_show", templateVars);
 });
 //Go to specified tinyURL
