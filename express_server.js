@@ -50,6 +50,7 @@ app.get("/u/:id", (req, res) => {
 //POST//
 //////////////////////////////////////////////////////////////////////
 
+//Add new shortURL and longURL pair (with randomly generated short URL)
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const shortUrl = generateRandomString(req.body.longURL);
@@ -57,6 +58,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/:${shortUrl}`);
 });
 
+//Delete specified shortURL and longURL pair from database
 app.post("/urls/:id/delete", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const deleteURL = req.body.id;
@@ -65,6 +67,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect('/urls')
 });
 
+//Change the corresponding longURL of specified shortURL
 app.post("/urls/:id", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const updateURL = Object.keys(req.body)[0];

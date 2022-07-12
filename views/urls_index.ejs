@@ -35,8 +35,8 @@
             <tr>
               <td><%= id %></td>
               <td><%= urls[id] %></td>
-              <td><form class="form-inline" action=<%= `/urls/${id}`%> method="GET"><button name=id value=<%= id %> style='background-color:white; border-color:blue; color:blue'type="submit" class="btn btn-primary">Edit</button></form></td>
-              <td><form class="form-inline" action="/urls/:id/delete" method="POST"><button name=id value=<%= id %> style='background-color:white; border-color:red; color:red'type="submit" class="btn btn-primary">Delete</button></form></td>
+              <td><form class="form-inline" action=<%= `/urls/${id}`%> method="GET"><button name=id value=<%= id %> class="btn btn-outline-primary">Edit</button></form></td>
+              <td><form class="form-inline" action="/urls/:id/delete" method="POST"><button name=id value=<%= id %> class="btn btn-outline-danger">Delete</button></form></td>
                 </div>
               </form>
             </tr>
