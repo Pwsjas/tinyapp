@@ -60,8 +60,17 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const deleteURL = req.body.id;
+  console.log(req.body.id);
   delete urlDatabase[deleteURL];
   res.redirect('/urls')
+});
+
+app.post("/urls/:id", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  const updateURL = Object.keys(req.body)[0];
+  console.log(updateURL);
+  urlDatabase[updateURL] = req.body[updateURL];
+  res.redirect(`/urls/:${updateURL}`);
 });
 
 
