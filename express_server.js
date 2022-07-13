@@ -181,6 +181,7 @@ app.post("/register", (req, res) => {
       email: req.body.email,
       password: req.body.password
     };
+    res.cookie('user_id', userID);
     res.redirect(`/urls`);
   }
 });
