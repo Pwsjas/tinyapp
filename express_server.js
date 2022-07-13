@@ -73,10 +73,14 @@ app.get("/urls", (req, res) => {
 });
 //View New tinyURL
 app.get("/urls/new", (req, res) => {
-  const templateVars = { 
-    user: users[req.cookies['user_id']],
-  };
-  res.render("urls_new", templateVars);
+  if (req.cookies['user_id']) {
+    const templateVars = { 
+      user: users[req.cookies['user_id']],
+    };
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect('/login');
+  } 
 });
 //View Specific tinyURL
 app.get("/urls/:id", (req, res) => {
@@ -91,25 +95,37 @@ app.get("/urls/:id", (req, res) => {
 });
 //Go to specified tinyURL
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id.slice(1)];
-  res.redirect(longURL);
+  const longURL = urlDatabase[req.params.id];
+  if (longURL) {
+    res.redirect(longURL);
+  } else {
+    res.status(400).send('400 Error: shortURL does not exist!');
+  }
 });
 
 //Go to register page
 app.get("/register", (req, res) => {
-  const templateVars = { 
-    user: users[req.cookies['user_id']],
-    urls: urlDatabase 
-  };
-  res.render('register', templateVars);
+  if (req.cookies['user_id']) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = { 
+      user: users[req.cookies['user_id']],
+      urls: urlDatabase 
+    };
+    res.render('register', templateVars);
+  }
 });
 
 app.get("/login", (req, res) => {
-  const templateVars = { 
-    user: users[req.cookies['user_id']],
-    urls: urlDatabase 
-  };
-  res.render('login', templateVars);
+  if (req.cookies['user_id']) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = { 
+      user: users[req.cookies['user_id']],
+      urls: urlDatabase 
+    };
+    res.render('login', templateVars);
+  }
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -118,10 +134,14 @@ app.get("/login", (req, res) => {
 
 //Add new shortURL and longURL pair (with randomly generated short URL)
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  const shortUrl = generateRandomString(6);
-  urlDatabase[shortUrl] = req.body.longURL;
-  res.redirect(`/urls/:${shortUrl}`);
+  if (req.cookies['user_id']) {
+    console.log(req.body); // Log the POST request body to the console
+    const shortUrl = generateRandomString(6);
+    urlDatabase[shortUrl] = req.body.longURL;
+    res.redirect(`/urls`);
+  } else {
+    res.status(403).send('403 Error: You cannot create shortURLS unless you are logged in!');
+  }
 });
 
 //Delete specified shortURL and longURL pair from database
