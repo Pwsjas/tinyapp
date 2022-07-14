@@ -104,15 +104,22 @@ app.get("/urls/new", (req, res) => {
 });
 //View Specific tinyURL
 app.get("/urls/:id", (req, res) => {
-  let templateVars = {};
-  console.log(req.params.id);
-  if (req.params.id[0] === ':') {
-    templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id.slice(1)].longURL };
-  } else {  
-    templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL };
+  if (req.cookies['user_id']) {
+    if (urlDatabase[req.params.id].userID !== req.cookies['user_id']) {
+      return res.status(403).send('403 Error: Cannot view URLs created by other users!');
+    }
+    let templateVars = {};
+    console.log(req.params.id);
+    if (req.params.id[0] === ':') {
+      templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id.slice(1)].longURL };
+    } else {  
+      templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL };
+    }
+    templateVars['user'] = users[req.cookies['user_id']];
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(403).send('403 Error: You are not logged in!');
   }
-  templateVars['user'] = users[req.cookies['user_id']];
-  res.render("urls_show", templateVars);
 });
 //Go to specified tinyURL
 app.get("/u/:id", (req, res) => {
@@ -171,6 +178,15 @@ app.post("/urls", (req, res) => {
 
 //Delete specified shortURL and longURL pair from database
 app.post("/urls/:id/delete", (req, res) => {
+  if (!urlDatabase[req.params.id]) {
+    return res.status(400).send('400 Error: shortURL does not exist!');
+  }
+  if (!req.cookies['user_id']) {
+    return res.status(403).send('403 Error: Must be logged in to delete!');
+  }
+  if (urlDatabase[req.params.id].userID !== req.cookies['user_id']) {
+    return res.status(403).send('403 Error: Cannot delete other users shortURLs!');
+  }
   console.log(req.body); // Log the POST request body to the console
   const deleteURL = req.body.id;
   console.log(req.body.id);
@@ -180,6 +196,15 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //Change the corresponding longURL of specified shortURL
 app.post("/urls/:id", (req, res) => {
+  if (!urlDatabase[req.params.id]) {
+    return res.status(400).send('400 Error: shortURL does not exist!');
+  }
+  if (!req.cookies['user_id']) {
+    return res.status(403).send('403 Error: Must be logged in to edit!');
+  }
+  if (urlDatabase[req.params.id].userID !== req.cookies['user_id']) {
+    return res.status(403).send('403 Error: Cannot edit other users shortURLs!');
+  }
   const updateURL = Object.keys(req.body)[0];
   urlDatabase[updateURL].longURL = req.body[updateURL];
   console.log(urlDatabase);
