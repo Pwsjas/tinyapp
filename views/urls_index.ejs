@@ -30,19 +30,26 @@
             <th scope="col">Delete</th>
           </tr>
         </thead>
-        <tbody>
-          <% for (let id in urls) { %>
-            <tr>
-              <td><%= id %></td>
-              <td><%= urls[id] %></td>
-              <td><form class="form-inline" action=<%= `/urls/${id}`%> method="GET"><button name=id value=<%= id %> class="btn btn-outline-primary">Edit</button></form></td>
-              <td><form class="form-inline" action="/urls/:id/delete" method="POST"><button name=id value=<%= id %> class="btn btn-outline-danger">Delete</button></form></td>
-                </div>
-              </form>
-            </tr>
+          <% if(user !== undefined) { %>
+            <tbody>
+            <% for (let id in urls) { %>
+              <tr>
+                <td><%= id %></td>
+                <td><%= urls[id].longURL %></td>
+                <td><form class="form-inline" action=<%= `/urls/${id}`%> method="GET"><button name=id value=<%= id %> class="btn btn-outline-primary">Edit</button></form></td>
+                <td><form class="form-inline" action="/urls/:id/delete" method="POST"><button name=id value=<%= id %> class="btn btn-outline-danger">Delete</button></form></td>
+                  </div>
+                </form>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+          <% } else { %>
+          </table>
+          <div class="alert alert-danger" role="alert">
+            You must be logged in to view your URLs!
+          </div>
           <% } %>
-        </tbody>
-      </table>
     </main>
     <!-- Bootstrap JS -->
     <script

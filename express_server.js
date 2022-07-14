@@ -12,8 +12,14 @@ app.use(cookieParser());
 //////////////////////////////////////////////////////////////////////
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 const users = {
@@ -58,17 +64,31 @@ const checkDuplicateEmail = (email) => {
   return null;
 }; 
 
+const urlForUser = (id) => {
+  const output = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      output[shortURL] = {
+        longURL: urlDatabase[shortURL].longURL,
+        userID: urlDatabase[shortURL].userID
+      }
+    }
+  }
+  return output;
+}
+
 //////////////////////////////////////////////////////////////////////
 //GET//
 //////////////////////////////////////////////////////////////////////
 
 //View All tinyURLs
 app.get("/urls", (req, res) => {
+  const userURLs = urlForUser(req.cookies['user_id']);
   const templateVars = { 
     user: users[req.cookies['user_id']],
-    urls: urlDatabase 
+    urls: userURLs
   };
-  console.log(templateVars);
+  console.log(userURLs)
   res.render('urls_index', templateVars);
 });
 //View New tinyURL
@@ -85,17 +105,18 @@ app.get("/urls/new", (req, res) => {
 //View Specific tinyURL
 app.get("/urls/:id", (req, res) => {
   let templateVars = {};
+  console.log(req.params.id);
   if (req.params.id[0] === ':') {
-    templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id.slice(1)] };
+    templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id.slice(1)].longURL };
   } else {  
-    templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+    templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL };
   }
   templateVars['user'] = users[req.cookies['user_id']];
   res.render("urls_show", templateVars);
 });
 //Go to specified tinyURL
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
   if (longURL) {
     res.redirect(longURL);
   } else {
@@ -135,9 +156,13 @@ app.get("/login", (req, res) => {
 //Add new shortURL and longURL pair (with randomly generated short URL)
 app.post("/urls", (req, res) => {
   if (req.cookies['user_id']) {
-    console.log(req.body); // Log the POST request body to the console
     const shortUrl = generateRandomString(6);
-    urlDatabase[shortUrl] = req.body.longURL;
+    urlDatabase[shortUrl] = {
+      longURL: req.body.longURL,
+      userID: req.cookies['user_id']
+    }
+    console.log(urlDatabase[shortUrl]);
+    console.log(urlDatabase);
     res.redirect(`/urls`);
   } else {
     res.status(403).send('403 Error: You cannot create shortURLS unless you are logged in!');
@@ -155,11 +180,10 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //Change the corresponding longURL of specified shortURL
 app.post("/urls/:id", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
   const updateURL = Object.keys(req.body)[0];
-  console.log(updateURL);
-  urlDatabase[updateURL] = req.body[updateURL];
-  res.redirect(`/urls/:${updateURL}`);
+  urlDatabase[updateURL].longURL = req.body[updateURL];
+  console.log(urlDatabase);
+  res.redirect(`/urls`);
 });
 
 //Login Cookie
@@ -195,7 +219,7 @@ app.post("/register", (req, res) => {
   } else if(checkDuplicateEmail(req.body.email)) {
     res.status(400).send('400 Error: email address already in use!');
   } else {
-    const userID = generateRandomString(10);
+    const userID = generateRandomString(6);
     users[userID] = {
       id: userID,
       email: req.body.email,
