@@ -1,3 +1,4 @@
+//Returns a random string of numbers and letters of a specified length
 const generateRandomString = (length) => {
   let generatedString = '';
   let random = 0;
@@ -14,6 +15,8 @@ const generateRandomString = (length) => {
   return generatedString;
 };
 
+//Returns an object of shortURLs and their respective longURL based on the passed creator ID
+//Mimics the layout of the database object within express_server.js
 const urlForUser = (id, database) => {
   const output = {};
   for (const shortURL in database) {
@@ -27,6 +30,7 @@ const urlForUser = (id, database) => {
   return output;
 };
 
+//Returns a user ID given that a passed email, is within the passed database (the email's associated user ID)
 const getUserByEmail = (email, database) => {
   for (const user in database) {
     if (database[user].email === email) {
@@ -39,4 +43,4 @@ module.exports = {
   generateRandomString,
   urlForUser,
   getUserByEmail
-}
+};
