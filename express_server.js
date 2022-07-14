@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require('cookie-parser')
+const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -213,17 +214,17 @@ app.post("/urls/:id", (req, res) => {
 
 //Login Cookie
 app.post("/login", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
   const userID = checkDuplicateEmail(req.body.email);
    if (userID) {
      if (users[userID].email === req.body.email) {
-       if (users[userID].password === req.body.password) {
+       if (bcrypt.compareSync(req.body.password, users[userID].password)) {
         res.cookie('user_id', userID);
        }
     }
   } else {
-    res.status(403).send('403 Error: Invalid Email or Password!');
+    return res.status(403).send('403 Error: Invalid Email or Password!');
   }
+  console.log(users[userID]);
   res.redirect(`/urls`);
 });
 
@@ -244,12 +245,15 @@ app.post("/register", (req, res) => {
   } else if(checkDuplicateEmail(req.body.email)) {
     res.status(400).send('400 Error: email address already in use!');
   } else {
+    const password = req.body.password;
+    const hashedPassword = bcrypt.hashSync(password, 10);
     const userID = generateRandomString(6);
     users[userID] = {
       id: userID,
       email: req.body.email,
-      password: req.body.password
+      password: hashedPassword
     };
+    console.log(users[userID]);
     res.cookie('user_id', userID);
     res.redirect(`/urls`);
   }
